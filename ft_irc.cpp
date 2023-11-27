@@ -38,9 +38,9 @@ public:
         // bind
         bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress));
         // listen(serverSocket, SOMAXCONN);
-        // struct sockaddr_in clientAddress;
-        // socklen_t clientAddressLength = sizeof(clientAddress);
-        listen(serverSocket, 5);
+         struct sockaddr_in clientAddress;
+         socklen_t clientAddressLength = sizeof(clientAddress);
+        listen(serverSocket, 10);
         while (1)
         {
             int readyFds = poll(pollVector.data(), pollVector.size(), -1);
@@ -49,13 +49,13 @@ public:
                 if (pollVector[0].revents & POLLIN)
                 {
                     std::cout << pollVector.size();
-                    int clientSocket = accept(serverSocket, NULL, NULL);
-                    std::cout << "ffffffffffff"<< std::endl;
+                    int clientSocket = accept(serverSocket,(struct sockaddr*)&clientAddress, &clientAddressLength);
+                    //std::cout << "ffffffffffff"<< std::endl;
                     user example(clientSocket, "ismail", "hosname");
                     clients.push_back(example);
                     pollfd.fd = clientSocket;
                     pollfd.events = POLLIN;
-                    pollfd.revents = 0;
+                    pollfd.revents = 0; 
                     pollVector.push_back(pollfd);
                 }
 

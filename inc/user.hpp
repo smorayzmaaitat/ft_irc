@@ -24,14 +24,9 @@ public:
     std::string nickname;
     std::string hostname;
     int socket_fd;
-    std::vector<std::string> channel_invitel;
+    std::vector<std::string> channel_invited;
     user(int fd , std::string nick, std::string host);
     void displayInfo();
-
-    void setpermission(std::string chanelname, std::string Permission);
-
-    int getpermission(std::string chanelname);
-
-
+    void join_chanel(std::string chanelname, std::vector<Channel> &Channels);
     void create_chanel(std::string chanelname,std::string chanel_topic,std::vector<Channel> &Channels);
 };
