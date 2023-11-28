@@ -9,17 +9,22 @@
  * '-----------------------------------------------'
  */
 
+#pragma once
+#include "ft_irc.hpp"
 
-#include "inc/ft_irc.hpp"
-#include <poll.h>
-
-
-int main(int argc, char **argv)
+class Server
 {
-    (void)argv;
-    if (argc != 3)
-        std::cout << "\033[1;31m ./ircserv <port> <password>" << std::endl;
-    Server server(3322);
-
-    return (0);
-}
+public:
+    int port;
+    int serverSocket;
+    user example;
+    std::vector<user> clients;
+    std::vector<Channel> Channels;
+    struct pollfd pollfd;
+    std::vector<struct pollfd> pollVector;
+    char buffer[1024];
+    Server(int port);
+    int client_fd;
+    struct sockaddr_in clientAddress;
+    void commands(char *buffer);
+};

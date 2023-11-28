@@ -11,16 +11,16 @@
 
 #include "./inc/ft_irc.hpp"
 
-user::user(int fd, std::string nick, std::string host) : nickname(nick), hostname(host), socket_fd(fd)
+user::user()
 {
 }
 
 // Member function to display user information
-void user::displayInfo()
-{
-    std::cout << "Nickname: " << nickname << "\n";
-    std::cout << "Hostname: " << hostname << "\n";
-}
+// void user::displayInfo()
+// {
+//     std::cout << "Nickname: " << nickname << "\n";
+//     std::cout << "Hostname: " << hostname << "\n";
+// }
 
 void user::create_chanel(std::string chanelname, std::string chanel_topic, std::vector<Channel> &Channels)
 {
@@ -63,6 +63,23 @@ void user::join_chanel(std::string chanelname, std::vector<Channel> &Channels)
                 else
                     throw "u are in channel";
             }
+        }
+    }
+}
+
+void user::direct_message(std::string name,const  std::string *msg,std::vector<user> &users, struct sockaddr_in *clientAddress)
+{
+    (void)clientAddress;
+    for (std::vector<user>::iterator it = users.begin(); it != users.end(); it++)
+    {
+      
+        if (it->nickname == name || it->username == name)
+        { 
+        std::cout <<"---------->nickname " << it->nickname.size() << it->nickname << std::endl;
+       int h = send(it->socket_fd, (":" + it->nickname + " " + *msg).c_str(), (":" + this->nickname + " " + *msg).length(), 0);
+    
+        //send(it->socket_fd,msg,msg->size(),0);
+        std::cout << "-----<>" << h << std::endl;
         }
     }
 }

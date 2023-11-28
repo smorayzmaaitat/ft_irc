@@ -43,6 +43,6 @@ public:
     int  inter_passowrd();
     void user_oparator(int this_user ,int user_fd);
     void remove_user(int this_user ,int fd);
-    void send_msg(char *bufer);
+    void send_msg(const char *bufer);
 };
 

@@ -19,14 +19,15 @@
 
 class user
 {
-    
+
 public:
     std::string nickname;
-    std::string hostname;
+    std::string username;
     int socket_fd;
     std::vector<std::string> channel_invited;
-    user(int fd , std::string nick, std::string host);
+    user();
     void displayInfo();
     void join_chanel(std::string chanelname, std::vector<Channel> &Channels);
-    void create_chanel(std::string chanelname,std::string chanel_topic,std::vector<Channel> &Channels);
+    void create_chanel(std::string chanelname, std::string chanel_topic, std::vector<Channel> &Channels);
+    void direct_message(std::string name, const  std::string *msg, std::vector<user> &users, struct sockaddr_in *clientAddress);
 };

@@ -9,7 +9,7 @@
 
 NAME = ircserv
 
-src = ft_irc.o user.o channel.o
+src = ft_irc.o user.o channel.o server.o
 CC = c++
 CXXFLAGS =  -Wall -Wextra -Werror -std=c++98 
 RM = rm -f

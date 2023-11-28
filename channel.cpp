@@ -124,10 +124,10 @@ void Channel::user_oparator(int this_user ,int user_fd)
         throw " u not operator";
 }
 
-void Channel::send_msg(char *bufer)
+void Channel::send_msg(const char *bufer)
 {
     for (std::vector<int>::iterator it = this->users_fd.begin(); it != this->users_fd.end(); it++)
     {
-        send(*it,bufer,sizeof(bufer),0);
+        send(*it,bufer,strlen(bufer),0);
     }
 }
