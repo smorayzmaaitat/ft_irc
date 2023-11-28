@@ -46,7 +46,7 @@ void user::join_chanel(std::string chanelname, std::vector<Channel> &Channels)
                 if (invites != channel_invited.end())
                 {
                     std::map<int, int>::iterator exits = it->user_end_Permissions.find(this->socket_fd);
-                    //chek the user is not joined this channel 39al zaml 
+                    // chek the user is not joined this channel 39al zaml
                     if (exits == it->user_end_Permissions.end())
                         it->user_end_Permissions.insert(std::make_pair(this->socket_fd, 0));
                     else
@@ -67,19 +67,21 @@ void user::join_chanel(std::string chanelname, std::vector<Channel> &Channels)
     }
 }
 
-void user::direct_message(std::string name,const  std::string *msg,std::vector<user> &users, struct sockaddr_in *clientAddress)
+void user::direct_message(std::string name, const std::string *msg, std::vector<user> &users, struct sockaddr_in *clientAddress)
 {
     (void)clientAddress;
+    (void)msg;
     for (std::vector<user>::iterator it = users.begin(); it != users.end(); it++)
     {
-      
+
         if (it->nickname == name || it->username == name)
-        { 
-        std::cout <<"---------->nickname " << it->nickname.size() << it->nickname << std::endl;
-       int h = send(it->socket_fd, (":" + it->nickname + " " + *msg).c_str(), (":" + this->nickname + " " + *msg).length(), 0);
-    
-        //send(it->socket_fd,msg,msg->size(),0);
-        std::cout << "-----<>" << h << std::endl;
+        {
+            std::string privmsg = PRIVMSG_FORMAT(name, name,name, "#" + it->nickname.c_str(),*msg);
+           // std::cout << "---------->nickname " << it->nickname.size() << it->nickname << std::endl;
+            int h = send(it->socket_fd, privmsg.c_str(), privmsg.length(), 0);
+
+            // send(it->socket_fd,msg,msg->size(),0);
+            std::cout << "-----<>" << h << std::endl;
         }
     }
 }

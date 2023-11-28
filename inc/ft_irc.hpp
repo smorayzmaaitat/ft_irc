@@ -89,3 +89,4 @@
 
 # define RPL_BOT(hostname, nick, message)                      ":" + hostname + " 001 " + nick + " Dad joke: " +  message + "\r\n" 
 # define ERR_BOT(hostname, nick)                      ":" + hostname + " 450 " + nick + "enter [BOT generate] to generate a joke" + "\r\n"
+#define PRIVMSG_FORMAT(senderNick, senderUsername, senderHostname, receiver, message) ":" + senderNick + "!~" + senderUsername + "@" + senderHostname + " PRIVMSG " + receiver + " :" + message + "\r\n"

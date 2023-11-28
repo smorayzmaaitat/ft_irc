@@ -93,8 +93,8 @@ void Server::commands(char *buffer)
     }
 
     if (!strncmp(buffer, "PRIVMSG", 7))
-    {  
-        std::string comand = buffer + 8;
+    {
+        std::string comand = buffer + 8;    
         size_t pos = comand.find(' ');
         std::string name = comand.substr(0, pos);
         std::string msg = comand.substr(pos + 1, comand.size() - name.size());
