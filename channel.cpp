@@ -1,133 +1,240 @@
-/**
- * .-----------------------------------------------.
- * |       ___                 _                   |
- * |      / __) _             (_)                  |
- * |     | |__ | |_            _   ____  ____      |
- * |     |  __)|  _)          | | / ___)/ ___)     |
- * |     | |   | |__  _______ | || |   ( (___      |
- * |     |_|    \___)(_______)|_||_|    \____)     |
- * '-----------------------------------------------'
- */
+#include "Channel.hpp"
 
-#include "./inc/ft_irc.hpp"
+class Channel;
 
-Channel::Channel( std::string &n, std::string &t,int user_fd )
-    : name(n), topic(t)
+Channel::Channel()
 {
-    user_end_Permissions.insert(std::make_pair(user_fd, 1));
+    // this->channel_clients = std::vector<Client>();
 }
 
-void Channel::displayInfo()
+Channel::~Channel()
 {
-    std::cout << "Channel Name: " << name << "\n";
-    std::cout << "Topic: " << topic << "\n";
 }
 
-void Channel::setTopic(const std::string &newTopic)
+Channel::Channel(std::string &name)
 {
-    topic = newTopic;
-}
+    if (!name.length())
+        throw std::logic_error("error: Channel name");
 
-void Channel::set_topic(std::string topic)
-{
-
-    this->topic = topic;
-}
-void Channel::set_pass()
-{
-    std::cout << "passowrd : ";
-    std::cin >> this->passowrd;
-}
-void Channel::set_limit()
-{
-    std::cout << "limit of users : ";
-    std::cin >> this->limit;
-}
-
-void Channel::set_permestion(std::string pir, int user_fd)
-{
-
-    std::map<int, int>::iterator it = user_end_Permissions.find(user_fd);
-    if (it != user_end_Permissions.end() && it->second)
+    int i = 0;
+    while (name[i])
     {
-
-        if (invite == 1 && pir == "+i")
-            this->invite = 0;
-        else if (invite == 0 && pir == "+i")
+        if (name[i] == 7 || name[i] == ' ' || name[i] == ',')
+            throw std::logic_error("error: Channel name");
+        i++;
+    }
+    this->name = name;
+    this->channel_clients = std::vector<Client>();
+    this->channelUsersLimit = 10;
+    this->modeI = false;
+    this->modeK = false;
+    this->modeT = false;
+    this->modeL = false;
+    this->topic = "";
+}
+bool Channel::isChannelFull()
+{
+    if (this->modeL && channel_clients.size() >= channelUsersLimit)
+        return true;
+    return false;
+}
+void Channel::addInvited(Client &client)
+{
+    for (size_t i = 0; i < invitedClients.size(); i++)
+    {
+        if (client == invitedClients[i])
+            return;
+    }
+    this->invitedClients.push_back(client);
+}
+void Channel::removeInvitation(Client &client)
+{
+    std::vector<Client>::iterator itr;
+    for (itr = invitedClients.begin(); itr < invitedClients.end(); itr++)
+    {
+        if (client == *itr)
         {
-            this->invite = 1;
-        }
-        if (t == 1 && pir == "+t")
-            this->t = 0;
-        else if (t == 0 && pir == "+t")
-        {
-            this->t = 1;
-        }
-
-        if (k == 1 && pir == "+k")
-            this->k = 0;
-        else if (k == 0 && pir == "+k")
-        {
-            set_pass();
-            this->k = 1;
-        }
-        if (limit >= 0 && pir == "+l")
-            this->k = -1;
-        else if (k == -1 && pir == "+l")
-        {
-            set_limit();
+            invitedClients.erase(itr);
+            return;
         }
     }
-    else
-        throw "u not operator :";
 }
-
-int Channel::inter_passowrd()
+bool Channel::isInvited(Client &client)
 {
-    std::string pass;
-    std::cin >> pass;
-    if (pass == passowrd)
-        return 1;
-    return 0;
-}
-
-void Channel::remove_user(int this_user ,int user_fd)
-{
-    std::map<int, int>::iterator thi_user = user_end_Permissions.find(this_user);
-
-    std::map<int, int>::iterator it = user_end_Permissions.find(user_fd);
-
-    if (it != user_end_Permissions.end() && thi_user->second)
+    for (size_t i = 0; i < invitedClients.size(); i++)
     {
-        user_end_Permissions.erase(it);
+        if (client == invitedClients[i])
+            return true;
     }
-     else
-        throw " u not operator";
+    return false;
 }
-
-void Channel::user_oparator(int this_user ,int user_fd)
+std::string Channel::getModes()
 {
-    //this_user = user who want to give operator
-
-    std::map<int, int>::iterator thi_user = user_end_Permissions.find(this_user);
-
-    std::map<int, int>::iterator it = user_end_Permissions.find(user_fd);
-
-    if (it != user_end_Permissions.end() && thi_user->second)
+    std::cout << "size == " << modes.size() << std::endl;
+    if (!modes.size())
     {
-        if (it->second == 0)
-        it->second = 1;
-        else
-            it->second = 0;
+        std::cout << "returned here\n";
+        return "+ns";
     }
-    else
-        throw " u not operator";
+    std::string mds = "+ns";
+    for (size_t i = 0; i < this->modes.size(); i++)
+    {
+        mds += this->modes[i];
+    }
+    return mds;
 }
-
-void Channel::send_msg(const char *bufer)
+std::string Channel::getTopic()
 {
-    for (std::vector<int>::iterator it = this->users_fd.begin(); it != this->users_fd.end(); it++)
+    return this->topic;
+}
+void Channel::setTopic(std::string newTopic)
+{
+    this->topic = newTopic;
+}
+int Channel::getUserslimit()
+{
+    return this->channelUsersLimit;
+}
+void Channel::setUserslimit(int limit)
+{
+    this->modeL = true;
+    this->channelUsersLimit = limit;
+}
+void Channel::setPassword(std::string pass)
+{
+    this->modeK = true;
+    this->password = pass;
+}
+std::string Channel::getPassword()
+{
+    return this->password;
+}
+std::string Channel::get_name() const
+{
+    return this->name;
+}
+std::vector<Client> Channel::getCHannelClients() const
+{
+    return this->channel_clients;
+}
+int Channel::getChannelClient(const Client &client) const
+{
+    for (size_t i = 0; i < this->channel_clients.size(); i++)
     {
-        send(*it,bufer,strlen(bufer),0);
+        if (this->channel_clients[i] == client)
+        {
+            return i;
+        }
     }
+    return -1;
+}
+void Channel::addClient(Client &client)
+{
+    this->channel_clients.push_back(client);
+}
+int Channel::getNumberOfClients()
+{
+    return this->channel_clients.size();
+}
+void Channel::removeAClientFromChannel(int index)
+{
+    this->channel_clients.erase(this->channel_clients.begin() + index);
+    this->channelOpArr.erase(this->channelOpArr.begin() + index);
+}
+int Channel::addOperator(Client &client)
+{
+    int clientIndex = getChannelClient(client);
+    std::cout << clientIndex << std::endl;
+    if (clientIndex >= 0 && this->channelOpArr[clientIndex] == true)
+        return -1;
+    this->channelOpArr.push_back(1);
+    return clientIndex;
+}
+bool Channel::isOperator(Client &client)
+{
+    int i = getChannelClient(client);
+    std::cout << channelOpArr[i] << "babe\n";
+    if (i >= 0)
+        return this->channelOpArr[i];
+    return false;
+}
+bool Channel::getModeI()
+{
+    return this->modeI;
+}
+bool Channel::getModeK()
+{
+    return this->modeK;
+}
+bool Channel::getModeT()
+{
+    return this->modeT;
+}
+bool Channel::getModeL()
+{
+    return this->modeL;
+}
+void Channel::setModeI(bool state)
+{
+    this->modeI = state;
+    if (std::find(modes.begin(), modes.end(), 'i') == modes.end() && state)
+        modes.push_back('i');
+    else if (!state)
+    {
+        std::vector<char>::iterator tmp = std::find(modes.begin(), modes.end(), 'i');
+        if (tmp != modes.end())
+        {
+            modes.erase(tmp);
+        }
+    }
+}
+void Channel::setModeL(bool state)
+{
+    this->modeL = state;
+    if (std::find(modes.begin(), modes.end(), 'l') == modes.end() && state)
+        modes.push_back('l');
+    else if (!state)
+    {
+        std::vector<char>::iterator tmp = std::find(modes.begin(), modes.end(), 'l');
+        if (tmp != modes.end())
+        {
+            modes.erase(tmp);
+        }
+    }
+}
+void Channel::setModeT(bool state)
+{
+    this->modeT = state;
+    if (std::find(modes.begin(), modes.end(), 't') == modes.end() && state)
+        modes.push_back('t');
+    else if (!state)
+    {
+        std::vector<char>::iterator tmp = std::find(modes.begin(), modes.end(), 't');
+        if (tmp != modes.end())
+        {
+            modes.erase(tmp);
+        }
+    }
+}
+void Channel::setModeK(bool state)
+{
+    this->modeK = state;
+    if (std::find(modes.begin(), modes.end(), 'k') == modes.end() && state)
+        modes.push_back('k');
+    else if (!state)
+    {
+        std::vector<char>::iterator tmp = std::find(modes.begin(), modes.end(), 'k');
+        if (tmp != modes.end())
+        {
+            modes.erase(tmp);
+        }
+    }
+}
+void Channel::modifOp(int index, int state)
+{
+    this->channelOpArr[index] = state;
+}
+void Channel::pushBackToOppArr()
+{
+    this->channelOpArr.push_back(0);
 }

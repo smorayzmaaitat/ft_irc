@@ -1,25 +1,19 @@
-/**
- * .-----------------------------------------------.
- * |       ___                 _                   |
- * |      / __) _             (_)                  |
- * |     | |__ | |_            _   ____  ____      |
- * |     |  __)|  _)          | | / ___)/ ___)     |
- * |     | |   | |__  _______ | || |   ( (___      |
- * |     |_|    \___)(_______)|_||_|    \____)     |
- * '-----------------------------------------------'
- */
+#include "Channel.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
+class Client;
+class Channel;
 
-
-#include "inc/ft_irc.hpp"
-#include <poll.h>
-
-
-int main(int argc, char **argv)
+int main(int ac, char **av)
 {
-    (void)argv;
-    if (argc != 3)
-        std::cout << "\033[1;31m ./ircserv <port> <password>" << std::endl;
-    Server server(3322);
-
-    return (0);
+  if (ac != 3)
+    return 0;
+  try
+  {
+    Server server(av[1], av[2]);
+  }
+  catch (std::exception &e)
+  {
+    std::cout << e.what() << std::endl;
+  }
 }
